@@ -2,4 +2,21 @@
 
 {% block body %}
     <h1>Hello!</h1>
+
+    {% for article in articles %}
+        {{ article.title }}
+        -
+
+        {% if article.user %}
+            {{ article.user.email }}
+        {% else %}
+            No user attached
+        {% endif %}
+
+        -
+        {% for tag in article.tags %}
+            {{ tag.name }}
+        {% endfor %}
+        <br />
+    {% endfor %}
 {% endblock %}

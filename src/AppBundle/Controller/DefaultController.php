@@ -3,44 +3,109 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Article;
+use AppBundle\Form\ArticleType;
+use AppBundle\Form\TagType;
+use Doctrine\ORM\EntityRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Class DefaultController
+ * @package AppBundle\Controller
+ * @Route("/articles")
+ */
 class DefaultController extends Controller
 {
     /**
-     * @Route("/", name="homepage")
+     * @Route("/", name="homepage_main")
      * @Template()
      */
     public function indexAction(Request $request)
     {
+        $manager = $this->getDoctrine()->getManager();
+
+        $articles = $manager->getRepository('AppBundle:Article')->findAll();
+
+        return [
+            'articles' => $articles
+        ];
     }
 
     /**
-     * @Route("/new-article", name="homepage")
+     * @Route("/new-article", name="asfasfasf")
      * @Template()
      */
     public function newArticleAction(Request $request)
     {
-        $article = new Article();
-        $article2 = new Article();
+        $form = $this->createForm(new ArticleType());
 
-        $article->setDescription('bla blal');
-        $article->setTitle('bla blal');
+        if ($form->handleRequest($request) && $form->isValid()) {
+            $article = $form->getData();
 
-        $article2->setDescription('bla blal');
-        $article2->setTitle('bla blal');
+            $manager = $this->getDoctrine()->getManager();
+            $manager->persist($article);
 
-        $manager = $this->getDoctrine()->getManager();
+            $manager->flush();
 
-        $manager->persist($article);
-        $manager->persist($article2);
-        $manager->flush();
+            return $this->redirectToRoute('homepage_main');
+        }
 
-        return new Response($article->getId());
+        return [
+            'form' => $form->createView()
+        ];
+    }
+    /**
+     * @Route("/articles/{id}/edit", name="article_edit")
+     * @Template()
+     */
+    public function editArticleAction($id, Request $request)
+    {
+        $article = $this->getDoctrine()
+            ->getRepository('AppBundle:Article')
+            ->find($id);
+
+        $form = $this->createForm(new ArticleType(), $article);
+
+        if ($form->handleRequest($request) && $form->isValid()) {
+            $article = $form->getData();
+
+            $manager = $this->getDoctrine()->getManager();
+            $manager->persist($article);
+
+            $manager->flush();
+
+            return $this->redirectToRoute('homepage_main');
+        }
+
+        return [
+            'form' => $form->createView()
+        ];
+    }
+
+    /**
+     * @Route("/new-tag", name="new_tag")
+     * @Template()
+     */
+    public function newTagAction(Request $request)
+    {
+        $form = $this->createForm(new TagType());
+
+        if ($form->handleRequest($request) && $form->isValid()) {
+            $tag = $form->getData();
+
+            $manager = $this->getDoctrine()->getManager();
+            $manager->persist($tag);
+            $manager->flush();
+
+            return $this->redirectToRoute('homepage_main');
+        }
+
+        return [
+            'form' => $form->createView()
+        ];
     }
 
     /**
@@ -52,12 +117,10 @@ class DefaultController extends Controller
         $manager = $this->getDoctrine()->getManager();
 
         $article = $manager->getRepository('AppBundle:Article')
-            ->findOneByTitle('bla blal');
+            ->find(1);
 
-        $article->setTitle('new title');
-
-//        $manager->remove($article);
-        var_dump($article);
+        $manager->remove($article);
+        $manager->flush();
         die;
     }
 
@@ -69,11 +132,12 @@ class DefaultController extends Controller
     {
         $manager = $this->getDoctrine()->getManager();
 
-        $article = $manager->getRepository('AppBundle:Article')
-            ->find($id);
+        /** @var EntityRepository $article */
+        $repository = $manager->getRepository('AppBundle:Article');
 
-        $article->setTitle('new title');
-        $manager->flush();
+        $article = $repository->find($id);
+
+        $article->setTitle('altceva');
 
         return new Response($article->getTitle());
     }

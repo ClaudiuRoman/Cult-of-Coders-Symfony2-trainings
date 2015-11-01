@@ -13,13 +13,17 @@ use Doctrine\ORM\EntityRepository;
 
 class ArticleRepository extends EntityRepository
 {
-    public function findWithTitle($title)
+    public function findArticlesSpecial($title)
     {
         $qb = $this->createQueryBuilder('a');
 
-        $qb
-            ->where('a.title = :title')
-            ->setParameter('title', $title);
+        $qb->where('a.title = :title')
+            ->andWhere('a.id != :id')
+            ->setParameter('title', $title)
+            ->orderBy('a.commentCount', 'DESC')
+            ->setParameter('id', 3)
+            ->setMaxResults(1)
+        ;
 
         return $qb->getQuery()->getResult();
     }

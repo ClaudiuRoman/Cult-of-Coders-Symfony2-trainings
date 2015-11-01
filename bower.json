@@ -1,0 +1,19 @@
+{
+  "name": "test_project",
+  "version": "0.0.0",
+  "homepage": "https://github.com/ClaudiuRoman/Cult-of-Coders-Symfony2-trainings",
+  "authors": [
+    "claudiu <claudiurom2006@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4"
+  }
+}
